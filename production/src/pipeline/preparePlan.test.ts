@@ -1,0 +1,40 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import { preparePlan, FICTION } from './preparePlan.js';
+import { productionGraph, verifySourceVoices } from './productionGraph.js';
+import { digest } from './runtime.js';
+test('real plan schema preserves dialogue order, fixed cast and separate teaser/fiction', async t => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'story-plan-')); t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  const file = path.join(dir, 'pipeline.json'), out = path.join(dir, 'out');
+  await fs.writeFile(file, JSON.stringify({ story_quality_check: { pass: true }, story_slug: 'test-story', characters: [{ tag: 'GHOST', voice_role: 'ghost' }], scenes: [{ scene_number: 2, speaker: 'GHOST', devanagari_dialogue: 'यहाँ मत आना।' }, { scene_number: 1, speaker: 'NARRATOR', narration_text: 'दरवाज़ा अपने आप खुला।' }], production_plan: { title: 'रहस्य | Hindi Horror Story', keyword: 'Hindi Horror Story', thumbnail_hook: 'कौन था वहाँ', short_scenes: [1, 2, 1], short_dialogue_scene: 2, short_narration: 'क्या यह सच है? पूरी कहानी देखें।', sound_events: [{}] } }));
+  const prepared = await preparePlan(file, out), { lines } = prepared;
+  assert.deepEqual(lines.map(x => x.scene), [1, 2, 99, 90]);
+  assert.equal(lines[0].voice, 'Charon'); assert.equal(lines[1].voice, 'Aoede'); assert.equal(lines[1].script, 'यहाँ मत आना।');
+  const graph = productionGraph({out,production:dir,projectFile:file,prepared,prompt:'fixture',local:async()=>{},schedule:async()=>{}});
+  assert.deepEqual(graph.map(s=>s.id),['flow','voices','sound','assets','master','derivatives','final-voice-qc','package','gate','schedule']);
+  assert.ok(graph.find(s=>s.id==='voices')!.outputs.includes(path.join(out,'qc/source-voice-qc.json')));
+  assert.ok(!graph.find(s=>s.id==='voices')!.outputs.includes(path.join(out,'voice-qc.json')));
+  assert.ok(graph.find(s=>s.id==='final-voice-qc')!.outputs.includes(path.join(out,'voice-qc.json')));
+  assert.deepEqual(graph.find(s=>s.id==='schedule')!.dependencies,['gate']);
+  const flowBefore = await fs.readFile(path.join(out,'flow-plan.json'),'utf8');
+  const updated = JSON.parse(await fs.readFile(file,'utf8')); updated.scenes[0].status='done'; updated.scenes[0].video_sha256='receipt';
+  updated.production_plan.thumbnail_hook='नया सवाल'; await fs.writeFile(file,JSON.stringify(updated)); await preparePlan(file,out);
+  assert.equal(await fs.readFile(path.join(out,'flow-plan.json'),'utf8'),flowBefore,'status and thumbnail edits must not invalidate Flow');
+  updated.scenes.push({scene_number:21,speaker:'NARRATOR',narration_text:'असली कहानी अभी बाकी थी।'}); await fs.writeFile(file,JSON.stringify(updated));
+  let next=await preparePlan(file,out); assert.ok(!next.plan.fiction_scenes.includes(21));
+  updated.scenes.at(-1).narration_text=FICTION; await fs.writeFile(file,JSON.stringify(updated));next=await preparePlan(file,out);
+  assert.deepEqual(next.plan.fiction_scenes,[21]); assert.ok(!next.lines.some(l=>l.scene===99));
+  const project = JSON.parse(await fs.readFile(file, 'utf8')); project.story_quality_check.pass = false; await fs.writeFile(file, JSON.stringify(project));
+  await assert.rejects(preparePlan(file, out), /quality assessment/);
+});
+
+test('streaming voice checkpoint rejects source changes after transcription completed',async t=>{
+  const out=await fs.mkdtemp(path.join(os.tmpdir(),'voice-binding-'));t.after(()=>fs.rm(out,{recursive:true,force:true}));
+  const source=path.join(out,'source.wav'),target=path.join(out,'normalized.wav');await fs.writeFile(source,'original');await fs.writeFile(target,'normalized');
+  const line={scene:1,speaker:'NARRATOR',voice:'Charon',script:'कहानी',source_file:source,file:'normalized.wav'};
+  await fs.mkdir(path.join(out,'qc'));await fs.writeFile(path.join(out,'qc/source-voice-qc.json'),JSON.stringify({lines:[{...line,pass:true,source_sha256:await digest(source),sha256:await digest(target)}]}));
+  await verifySourceVoices(out,[line]);await fs.writeFile(source,'changed');await assert.rejects(verifySourceVoices(out,[line]),/scene 1/);
+});

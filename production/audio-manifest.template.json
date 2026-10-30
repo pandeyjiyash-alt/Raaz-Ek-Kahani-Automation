@@ -1,0 +1,9 @@
+{
+  "story": 9,
+  "sounds": [
+    { "id": 123456, "role": "music", "kind": "music", "cue": "opening", "name": "...", "creator": "...", "license": "CC0", "source": "https://freesound.org/...", "mixed_into_final": true },
+    { "id": 234567, "role": "sfx", "kind": "sfx", "name": "door creak", "scene": 4, "time_s": 41.2, "license": "CC0", "source": "https://freesound.org/...", "mixed_into_final": true }
+  ],
+  "short_sound_ids": [123456, 234567],
+  "measurements": { "music_under_voice_lufs": -25, "music_in_gaps_lufs": -17 }
+}

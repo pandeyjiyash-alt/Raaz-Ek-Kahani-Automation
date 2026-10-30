@@ -1,0 +1,20 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import {setup,root} from '../setupConfig.js';
+import {scheduleRelease} from './release.js';
+import {atomicJson} from './runtime.js';
+
+const value=(name:string)=>{const i=process.argv.indexOf(name);return i<0?undefined:process.argv[i+1];};
+const directory=value('--dir'),project=value('--project');
+if(!directory||!project)throw Error('--dir and existing --project are required');
+const dir=path.resolve(directory),cfg=await setup(false),series=JSON.parse(await fs.readFile(path.join(dir,'instagram-parts.json'),'utf8'));
+if(series.parts?.length!==3||series.account_id!=='6acf14014fd2186704d21b0c')throw Error('Expected three requested Instagram parts on the configured account');
+const delivery=await scheduleRelease(dir,{apiKey:cfg.apiKey,youtubeAccountId:cfg.accountId,instagramAccountId:series.account_id,instagramPartsOnly:true},path.resolve(project),AbortSignal.timeout(40*60_000));
+const ledgerFile=path.join(root,'production/output/story-library/story-ledger.json');
+const release=JSON.parse(await fs.readFile(path.join(dir,'release.json'),'utf8'));
+const ledger=JSON.parse(await fs.readFile(ledgerFile,'utf8')),row=ledger.stories.find((r:any)=>r.number===release.story_number);
+if(!row)throw Error('Story ledger row missing; remote submission markers retained');
+row.status=delivery.status;row.platform_posts=Object.fromEntries(delivery.posts.map((p:any)=>[p.kind,p]));
+row.instagram_serialization={parts:3,complete_story_preserved:true,scheduled_for:series.parts.map((p:any)=>p.scheduled_for)};
+await atomicJson(ledgerFile,ledger);
+console.log(JSON.stringify({event:'instagram_series_scheduled',...delivery}));

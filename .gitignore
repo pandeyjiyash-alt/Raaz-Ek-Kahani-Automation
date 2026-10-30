@@ -1,0 +1,34 @@
+# Secrets / local configuration
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+# Runtime sessions, caches and build outputs
+**/chrome-profile/
+**/.cache/
+**/node_modules/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/.git/
+**/agent/
+**/projects/
+**/story_builds/
+**/outputs/
+**/output/
+*.log
+*.mp4
+*.mp3
+*.wav
+*.m4a
+*.png
+*.jpg
+*.jpeg

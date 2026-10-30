@@ -1,0 +1,7 @@
+{
+  "final_mix_checked": true,
+  "lines": [
+    { "scene": 1, "speaker": "NARRATOR", "voice": "Charon", "source": "ai_studio", "file": "narration/narration-0001.wav",
+      "script": "...", "transcript": "...", "match": 0.97, "hindi_confidence": 0.99, "peak_dbtp": -1.5, "pass": true, "notes": "" }
+  ]
+}

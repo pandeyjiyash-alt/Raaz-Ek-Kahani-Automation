@@ -1,0 +1,42 @@
+{
+  "story_number": 9,
+  "story_name_hindi": "जुड़वाँ बहन का राज़",
+  "full_video": "judwaan-behen-ka-raaz-hindi-horror-story.mp4",
+  "short_video": "judwaan-behen-ka-raaz-short.mp4",
+  "reel_video": "../../output/instagram/judwaan-behen-ka-raaz-instagram-reel.mp4",
+  "thumbnail": "thumbnail.jpg",
+  "reel_cover": "../../output/instagram/judwaan-behen-ka-raaz-reel-cover.jpg",
+  "subtitles_full": "judwaan-behen-ka-raaz.hi.srt",
+  "subtitles_short": "judwaan-behen-ka-raaz-short.hi.srt",
+  "expected_spoken_lines": 30,
+  "script_lines_total": 30,
+  "script_lines_in_final": 30,
+  "fiction_note_in_final": true,
+  "chapter_source_timeline": [
+    { "scene": 1, "start": 0, "label": "Intro" },
+    { "scene": 2, "start": 5.0, "label": "..." }
+  ],
+  "youtube": {
+    "keyword": "chudail ki kahani",
+    "title": "जुड़वाँ बहन का राज़ | ... | Hindi Horror Story",
+    "description": "first line: hook + keyword ...\n\n0:00 Intro\n0:05 ...\n\n⚠️ यह कहानी 100% काल्पनिक है। ... AI ...\n\n👻 ऐसी ही डरावनी कहानियों के लिए हमें हर जगह फ़ॉलो करें:\n▶ YouTube: https://www.youtube.com/@raaz_ekkahani\n📸 Instagram: https://www.instagram.com/raaz_ekkahani\nSubscribe, follow and press the bell icon 🔔\n\n#horror #HindiHorror #chudail",
+    "tags": ["hindi horror story", "chudail ki kahani", "..."],
+    "playlist": "Raaz Ek Kahani – Hindi Horror Stories",
+    "end_screen": "latest story + subscribe, last 15 s",
+    "pinned_comment": "question + next story",
+    "category": "Film & Animation",
+    "language_hindi": true,
+    "synthetic_media_disclosed": true
+  },
+  "short": {
+    "title": "... 😱 #horror #horrorstories #HindiHorror #shorts #ytshorts",
+    "description": "... पूरी कहानी देखें — YouTube: @raaz_ekkahani ... काल्पनिक ... CTA block",
+    "burned_cta": true,
+    "burned_captions": true,
+    "related_video_plan": "set Related video to the full video in Studio after it is live"
+  },
+  "instagram": {
+    "caption": "... काल्पनिक ... CTA block ... #horror #horrorstories #hindihorror #chudail #horrorreels",
+    "ai_label": true
+  }
+}
